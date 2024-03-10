@@ -3,7 +3,7 @@ use productDB  //To create a product database
  db.createCollection("products")
 
 //To insert datas into collection
-db.products.insertMany([
+db.newProducts.insertMany([
     {
         "id": "1",
         "product_name": "Intelligent Fresh Chips",
@@ -221,6 +221,27 @@ Query: " db.products.find({product_color:"indigo",product_price:492}) "
 
 10.Delete the products which product price value are same
 
-Query: " db.products.delete({product_price:}) "
+Query: " var duplicates=db.newProducts.aggregate([
+    {
+        $group:
+        {
+            _id:"$product_price",
+            count:{$sum:1},
+            ids:{$push:"$_id"}
+        }
+    },{
+        $match:
+        {
+            count:{$gt:1}
+
+        }
+    }
+])
+duplicates.forEach(function(doc){
+    db.newProducts.deleteOne({_id:{$in:doc.ids.slice(1)}})
+}) 
+
+
+"
 
      
